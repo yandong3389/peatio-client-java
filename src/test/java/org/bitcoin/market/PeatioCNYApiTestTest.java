@@ -220,6 +220,10 @@ public class PeatioCNYApiTestTest {
     
     /**
      * 
+     * 总额
+     * 余额
+     * 
+     * 
      * 两种模式.. 超过0.5%即可交易
      * 
      * 数据库存储30分钟内趋势 Ticker
