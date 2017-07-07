@@ -26,7 +26,7 @@ import java.util.*;
 public class PeatioCNYApi extends AbstractMarketApi {
     private static final Logger LOG = LoggerFactory.getLogger(PeatioCNYApi.class);
 
-    private static final String PEATIO_URL = "https://peatio.com";
+    private static final String PEATIO_URL = "https://yunbi.com";
     private static final long DURATION = 1000;
     private static final int TIME_OUT = 15000;
 
@@ -327,12 +327,11 @@ public class PeatioCNYApi extends AbstractMarketApi {
     }
 
     @Override
-    public Double ticker(SymbolPair symbol) throws IOException {
+    public JSONObject ticker(SymbolPair symbol) throws IOException {
         String ticker_url = PEATIO_URL + "/api/v2/tickers/" + getSymbolPairDescFromUsd2Cny(symbol);
         String text = HttpUtils.getContentForGet(ticker_url, 5000);
         JSONObject jsonObject = JSONArray.parseObject(text);
-        JSONObject ticker = jsonObject.getJSONObject("ticker");
-        return FiatConverter.toUsd(ticker.getDouble("last"));
+        return jsonObject;
     }
 
     @Override

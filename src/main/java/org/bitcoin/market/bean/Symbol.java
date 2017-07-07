@@ -5,7 +5,35 @@ package org.bitcoin.market.bean;
  */
 
 public enum Symbol {
-    btc {
+    eos {
+        @Override
+        public boolean isEos() {
+            return true;
+        }
+        @Override
+        public boolean isBtc() {
+            return false;
+        }
+
+        @Override
+        public boolean isLtc() {
+            return false;
+        }
+
+        @Override
+        public boolean isUsd() {
+            return false;
+        }
+
+        @Override
+        public boolean isCny() {
+            return false;
+        }
+    }, btc {
+        @Override
+        public boolean isEos() {
+            return false;
+        }
         @Override
         public boolean isBtc() {
             return true;
@@ -27,6 +55,10 @@ public enum Symbol {
         }
     }, ltc {
         @Override
+        public boolean isEos() {
+            return false;
+        }
+        @Override
         public boolean isBtc() {
             return false;
         }
@@ -47,6 +79,10 @@ public enum Symbol {
         }
     }, usd {
         @Override
+        public boolean isEos() {
+            return false;
+        }
+        @Override
         public boolean isBtc() {
             return false;
         }
@@ -66,6 +102,10 @@ public enum Symbol {
             return false;
         }
     }, cny {
+        @Override
+        public boolean isEos() {
+            return false;
+        }
         @Override
         public boolean isBtc() {
             return false;
@@ -88,6 +128,8 @@ public enum Symbol {
     };
 
     public abstract boolean isBtc();
+
+    public abstract boolean isEos();
 
     public abstract boolean isLtc();
 

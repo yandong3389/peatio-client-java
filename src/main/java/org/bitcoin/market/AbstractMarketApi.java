@@ -185,7 +185,7 @@ public abstract class AbstractMarketApi {
         return this.market;
     }
 
-    public abstract Double ticker(SymbolPair symbol) throws IOException;
+    public abstract JSONObject ticker(SymbolPair symbol) throws IOException;
 
     public abstract BitOrder getOrder(AppAccount appAccount, Long orderId, SymbolPair symbolPair);
 

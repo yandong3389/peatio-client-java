@@ -33,6 +33,9 @@ public class HttpUtils {
     }
 
     public static Connection getConnectionForGetNoCookies(String url, Map<String, String>... datas) {
+        
+//        System.err.println(url);
+        
         url = appendHttpString(url);
         Connection connection = Jsoup.connect(url).userAgent(USER_AGENT).ignoreContentType(true).timeout(5000);
         if (datas != null && datas.length > 0 && !datas[0].isEmpty()) {

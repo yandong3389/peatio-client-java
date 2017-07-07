@@ -9,6 +9,8 @@ public class Asset {
     private Long id;
     private Long appAccountId;
     private Market market;
+    private Double availableEos = 0.0;
+    private Double frozenEos = 0.0;
     private Double availableBtc = 0.0;
     private Double frozenBtc = 0.0;
     private Double availableLtc = 0.0;
@@ -36,6 +38,23 @@ public class Asset {
         this.market = market;
     }
 
+    public Double getAvailableEos() {
+        return availableEos == null ? 0.0 : availableEos;
+    }
+    
+    public void setAvailableEos(Double availableEos) {
+        this.availableEos = availableEos;
+    }
+    
+    public Double getFrozenEos() {
+        return frozenEos == null ? 0.0 : frozenEos;
+    }
+    
+    public void setFrozenEos(Double frozenEos) {
+        this.frozenEos = frozenEos;
+    }
+    
+    
     public Double getAvailableBtc() {
         return availableBtc == null ? 0.0 : availableBtc;
     }

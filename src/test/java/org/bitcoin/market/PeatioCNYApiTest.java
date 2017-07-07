@@ -112,14 +112,14 @@ public class PeatioCNYApiTest {
         assertTrue(klines.size() > 0);
     }
 
-    @Test
-    public void testTicker() throws Exception {
-
-        AbstractMarketApi abstractMarketApi = MarketApiFactory.getInstance().getMarket(Market.PeatioCNY);
-        double ticker = abstractMarketApi.ticker(new SymbolPair(Symbol.btc, Symbol.cny));
-        assertTrue(ticker > 0.0);
-
-    }
+//    @Test
+//    public void testTicker() throws Exception {
+//
+//        AbstractMarketApi abstractMarketApi = MarketApiFactory.getInstance().getMarket(Market.PeatioCNY);
+//        double ticker = abstractMarketApi.ticker(new SymbolPair(Symbol.btc, Symbol.cny));
+//        assertTrue(ticker > 0.0);
+//
+//    }
 
     @Test
     public void testDepth() throws Exception {
