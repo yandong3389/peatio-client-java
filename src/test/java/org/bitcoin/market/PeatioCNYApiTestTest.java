@@ -1,26 +1,22 @@
 package org.bitcoin.market;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import org.bitcoin.common.FiatConverter;
-import org.bitcoin.market.bean.*;
-import org.junit.Test;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import org.bitcoin.market.bean.AppAccount;
+import org.bitcoin.market.bean.Kline;
+import org.bitcoin.market.bean.Market;
+import org.bitcoin.market.bean.Symbol;
+import org.bitcoin.market.bean.SymbolPair;
+import org.junit.Test;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.law.yuncoin.common.AccountUtil;
 
 public class PeatioCNYApiTestTest {
 
     private AppAccount getAppAccount() {
-        AppAccount appAccount = new AppAccount();
-        appAccount.setId(1L);
-        appAccount.setAccessKey("xx"); // todo 替换为access_key
-        appAccount.setSecretKey("zz"); // todo 替换为secret_key
-        return appAccount;
+        return AccountUtil.getAppAccount();
     }
 
 //    @Test
@@ -63,6 +59,8 @@ public class PeatioCNYApiTestTest {
 //    public void testGetInfo() throws Exception {
 //        AbstractMarketApi market = MarketApiFactory.getInstance().getMarket(Market.PeatioCNY);
 //        Asset asset = market.getInfo(getAppAccount());
+//        System.out.println(asset.getAvailableCny());
+//        System.out.println(asset.getAvailableEos());
 //        assertNotNull(asset);
 //    }
 
@@ -121,69 +119,69 @@ public class PeatioCNYApiTestTest {
 //        assertTrue(klines.size() > 0);
 //    }
 
-    @Test
-    public void testTicker() throws Exception {
-        
-        while(true){
-            
-            AbstractMarketApi abstractMarketApi = MarketApiFactory.getInstance().getMarket(Market.PeatioCNY);
-            JSONObject tickerObj = abstractMarketApi.ticker(new SymbolPair(Symbol.eos, Symbol.cny));
-            
-//        System.out.println(tickerObj.toJSONString());
-            
-            String at = tickerObj.getString("at");
-            JSONObject jsonobj = tickerObj.getJSONObject("ticker");
-            
-            long dateTime = Long.parseLong(at);
-            
-            DateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-            String dateStr = df.format(new Date(dateTime*1000));
-            
-            System.out.print(dateStr);
-            System.out.print("\t");
-            System.out.print(jsonobj.getString("buy"));
-            System.out.print("\t");
-            System.out.print(jsonobj.getString("sell"));
-            System.out.print("\t");
-            System.out.print(jsonobj.getString("last"));
-            System.out.println();
-//        System.out.print(jsonobj.toJSONString());
-            
-            
-            Thread.sleep(1000l);
-//            assertNotNull(tickerObj);
-        }
-
-
-    }
-
 //    @Test
-//    public void testDepth() throws Exception {
-//
-//        AbstractMarketApi market = MarketApiFactory.getInstance().getMarket(Market.PeatioCNY);
-//        JSONObject depth = market.get_depth(new SymbolPair(Symbol.eos, Symbol.cny), true);
+//    public void testTicker() throws Exception {
 //        
-//        JSONArray jsonarrasks = depth.getJSONArray("asks");
-//        JSONArray jsonarrbids = depth.getJSONArray("bids");
-//        
-//        for (int i = 0; i < jsonarrasks.size(); i++) {
+//        while(true){
 //            
-//            JSONObject obj = jsonarrasks.getJSONObject(i);
-//            JSONObject obj2 = jsonarrbids.getJSONObject(i);
-//            System.out.print(obj.getString("amount") + " " + obj.getString("price"));
+//            AbstractMarketApi abstractMarketApi = MarketApiFactory.getInstance().getMarket(Market.PeatioCNY);
+//            JSONObject tickerObj = abstractMarketApi.ticker(new SymbolPair(Symbol.eos, Symbol.cny));
+//            
+////        System.out.println(tickerObj.toJSONString());
+//            
+//            String at = tickerObj.getString("at");
+//            JSONObject jsonobj = tickerObj.getJSONObject("ticker");
+//            
+//            long dateTime = Long.parseLong(at);
+//            
+//            DateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+//            String dateStr = df.format(new Date(dateTime*1000));
+//            
+//            System.out.print(dateStr);
 //            System.out.print("\t");
-//            System.out.print(obj2.getString("amount") + " " + obj2.getString("price"));
+//            System.out.print(jsonobj.getString("buy"));
+//            System.out.print("\t");
+//            System.out.print(jsonobj.getString("sell"));
+//            System.out.print("\t");
+//            System.out.print(jsonobj.getString("last"));
 //            System.out.println();
+////        System.out.print(jsonobj.toJSONString());
 //            
+//            
+//            Thread.sleep(1000l);
+////            assertNotNull(tickerObj);
 //        }
-//        
-////        System.out.println(depth.getJSONArray("asks").toJSONString());
-////        System.out.println(depth.getJSONArray("bids").toJSONString());
-//        
-//        assertTrue(depth.containsKey("asks"));
-//        assertTrue(depth.containsKey("bids"));
+//
 //
 //    }
+
+    @Test
+    public void testDepth() throws Exception {
+
+        AbstractMarketApi market = MarketApiFactory.getInstance().getMarket(Market.PeatioCNY);
+        JSONObject depth = market.get_depth(new SymbolPair(Symbol.eos, Symbol.cny), true);
+        
+        JSONArray jsonarrasks = depth.getJSONArray("asks");
+        JSONArray jsonarrbids = depth.getJSONArray("bids");
+        
+        for (int i = 0; i < jsonarrasks.size(); i++) {
+            
+            JSONObject obj = jsonarrasks.getJSONObject(i);
+            JSONObject obj2 = jsonarrbids.getJSONObject(i);
+            System.out.print(obj.getString("amount") + " " + obj.getString("price"));
+            System.out.print("\t");
+            System.out.print(obj2.getString("amount") + " " + obj2.getString("price"));
+            System.out.println();
+            
+        }
+        
+//        System.out.println(depth.getJSONArray("asks").toJSONString());
+//        System.out.println(depth.getJSONArray("bids").toJSONString());
+        
+//        assertTrue(depth.containsKey("asks"));
+//        assertTrue(depth.containsKey("bids"));
+
+    }
 
     private void printData(List<Kline> klines){
       

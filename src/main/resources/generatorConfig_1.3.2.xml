@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+    <!-- 指jdbc 驱动包的路径,两种配置方式,第一种在此配置classPathEntry,第二种方式在pom中的plugin标签中追加dependencies标签和dependency标签 -->
+<!-- 	<classPathEntry location="E:/000_jinrongbang/workspace/money/src/main/webapp/WEB-INF/lib/mysql-connector-java-5.1.18.jar" /> -->
+
+	<context id="Mybatis3" targetRuntime="Mybatis3">
+
+    <plugin type="org.mybatis.generator.plugins.EqualsHashCodePlugin" />
+	<!-- mysql分页插件 -->   
+    <plugin type="d.mybatis_generator_plugin.GeneratorMysqlLimitOffsetPlugin" />  
+    <!-- 生成mybatis-config配置 -->
+    <plugin type="d.mybatis_generator_plugin.GeneratorMybatisConfigPlugin" />  
+
+      <commentGenerator>
+        <!-- 是否去除自动生成的注释 true：是 ： false:否 -->
+        <property name="suppressAllComments" value="true"/>
+      </commentGenerator>
+      
+		<!-- ORACLE数据库连接信息 -->
+		<jdbcConnection driverClass="com.mysql.jdbc.Driver"
+		                       connectionURL="jdbc:mysql://192.168.8.182:3306/test"
+			                   userId="root"
+			                   password="root" />
+
+      <javaTypeResolver>
+         <property name="forceBigDecimals" value="false"/>
+      </javaTypeResolver>
+      
+      <javaModelGenerator targetPackage="com.law.yuncoin.bean.base" targetProject="src/main/java">
+          <!-- enableSubPackages:是否让schema作为包的后缀 -->
+          <property name="enableSubPackages" value="true"/>
+          <property name="trimStrings" value="true"/>
+      </javaModelGenerator>
+       
+      <sqlMapGenerator targetPackage="mapper.base" targetProject="src/main/resources">
+           <property name="enableSubPackages" value="true"/>
+      </sqlMapGenerator>
+       
+      <javaClientGenerator type="XMLMAPPER" targetPackage="com.law.yuncoin.mapper.base" targetProject="src/main/java">
+        <property name="enableSubPackages" value="true"/>
+      </javaClientGenerator>
+      
+      
+<!--       <table tableName="user_info" domainObjectName="userInfo" enableCountByExample="true" enableSelectByExample="true" enableUpdateByExample="true" enableDeleteByExample="true"></table> -->
+
+        <!-- 数据库表名列表 -->
+	<table tableName="ticker_info" />
+	
+	</context>
+</generatorConfiguration>

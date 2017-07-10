@@ -173,6 +173,10 @@ public class PeatioCNYApi extends AbstractMarketApi {
                 asset.setFrozenCny(balance.getDouble("locked"));
                 asset.setFrozenUsd(FiatConverter.toUsd(asset.getFrozenCny()));
             }
+            if (currency1.equals("eos")) {
+                asset.setAvailableEos(balance.getDouble("balance"));
+                asset.setFrozenEos(balance.getDouble("locked"));
+            }
         }
         return asset;
 

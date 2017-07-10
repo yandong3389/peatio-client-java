@@ -1,4 +1,4 @@
-package com.matouwang.magellan.bean;
+package com.law.yuncoin.bean;
 
 public class User {  
     private Long id;  
