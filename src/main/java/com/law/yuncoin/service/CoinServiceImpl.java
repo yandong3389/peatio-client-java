@@ -74,7 +74,7 @@ public class CoinServiceImpl implements CoinService {
         
         System.err.println(sellAmount);
         
-        CoinOrder coinSellOrder = sell(buyPrice, sellAmount);
+        CoinOrder coinSellOrder = sell(sellPrice, sellAmount);
         
         
         if (coinSellOrder == null) {
