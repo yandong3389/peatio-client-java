@@ -187,9 +187,9 @@ public abstract class AbstractMarketApi {
 
     public abstract JSONObject ticker(SymbolPair symbol) throws IOException;
 
-    public abstract BitOrder getOrder(AppAccount appAccount, Long orderId, SymbolPair symbolPair);
+    public abstract CoinOrder getOrder(AppAccount appAccount, Long orderId, SymbolPair symbolPair);
 
-    public abstract List<BitOrder> getRunningOrders(AppAccount appAccount);
+    public abstract List<CoinOrder> getRunningOrders(AppAccount appAccount, Symbol symbol);
 
     Long createNonce() {
         return System.currentTimeMillis() / 1000;

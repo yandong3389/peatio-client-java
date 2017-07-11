@@ -9,16 +9,16 @@ import java.util.Date;
  * Created by lichang on 14-1-14.
  */
 @SuppressWarnings("serial")
-public class BitOrder {
+public class CoinOrder {
 
-    public BitOrder(OrderSide side, double quantity, String text, OrderType orderType) {
+    public CoinOrder(OrderSide side, double quantity, String text, OrderType orderType) {
         this(side, quantity, text, new Date(), orderType);
     }
 
-    public BitOrder() {
+    public CoinOrder() {
     }
 
-    public BitOrder(OrderSide side, double quantity, String text, Date created, OrderType orderType) {
+    public CoinOrder(OrderSide side, double quantity, String text, Date created, OrderType orderType) {
         this.orderSide = side;
         setOrderAmount(quantity);
         this.info = text;
@@ -28,11 +28,11 @@ public class BitOrder {
 
     public static long ERROR_ORDER_ID = -1L;
 
-    public static BitOrder getErrorOrder(String info) {
-        BitOrder bitOrder = new BitOrder();
-        bitOrder.setOrderId(ERROR_ORDER_ID);
-        bitOrder.setInfo(info);
-        return bitOrder;
+    public static CoinOrder getErrorOrder(String info) {
+        CoinOrder coinOrder = new CoinOrder();
+        coinOrder.setOrderId(ERROR_ORDER_ID);
+        coinOrder.setInfo(info);
+        return coinOrder;
     }
 
     private Long id;
@@ -64,9 +64,6 @@ public class BitOrder {
     private Long timeoutTime;
 
     private Boolean enable = true;
-
-    private Symbol symbol = Symbol.btc;
-
 
     public Long getId() {
         return id;
@@ -228,15 +225,6 @@ public class BitOrder {
         this.enable = enable;
     }
 
-
-    public Symbol getSymbol() {
-        return symbol;
-    }
-
-    public void setSymbol(Symbol symbol) {
-        this.symbol = symbol;
-    }
-
     public Long getTimeoutTime() {
         return timeoutTime;
     }
@@ -247,7 +235,7 @@ public class BitOrder {
 
     @Override
     public String toString() {
-        return "BitOrder{" +
+        return "CoinOrder{" +
                 "id=" + id +
                 ", market='" + market + '\'' +
                 ", orderId=" + orderId +

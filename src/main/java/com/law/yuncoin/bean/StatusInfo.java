@@ -10,6 +10,8 @@ public class StatusInfo {
     private BigDecimal buy1;
     private BigDecimal sell1;
     
+    private BigDecimal price;
+    
     public BigDecimal getLevel() {
         return level;
     }
@@ -34,5 +36,10 @@ public class StatusInfo {
     public void setUpFlag(boolean upFlag) {
         this.upFlag = upFlag;
     }
-    
+    public BigDecimal getPrice() {
+        return price;
+    }
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
 }

@@ -20,6 +20,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -183,7 +184,7 @@ public class PeatioCNYApi extends AbstractMarketApi {
     }
 
     @Override
-    public BitOrder getOrder(AppAccount appAccount, Long orderId, SymbolPair symbolPair) {
+    public CoinOrder getOrder(AppAccount appAccount, Long orderId, SymbolPair symbolPair) {
         TreeMap<String, String> params = new TreeMap<String, String>();
         params.put("canonical_verb", "GET");
         params.put("canonical_uri", "/api/v2/order");
@@ -193,13 +194,13 @@ public class PeatioCNYApi extends AbstractMarketApi {
     }
 
     @Override
-    public List<BitOrder> getRunningOrders(AppAccount appAccount) {
+    public List<CoinOrder> getRunningOrders(AppAccount appAccount, Symbol symbol) {
         TreeMap<String, String> params = new TreeMap<String, String>();
         params.put("canonical_verb", "GET");
         params.put("canonical_uri", "/api/v2/orders");
-        params.put("market", getSymbolPairDescFromUsd2Cny(new SymbolPair(Symbol.btc, Symbol.cny)));
+        params.put("market", getSymbolPairDescFromUsd2Cny(new SymbolPair(symbol, Symbol.cny)));
         params.put("limit", "100");
-        List<BitOrder> orders = new ArrayList<BitOrder>();
+        List<CoinOrder> orders = new ArrayList<CoinOrder>();
         JSONArray ordersResponse = send_requests(appAccount, params, TIME_OUT, true);
         for (Object anOrdersResponse : ordersResponse) {
             JSONObject orderResponse = (JSONObject) anOrdersResponse;
@@ -209,16 +210,35 @@ public class PeatioCNYApi extends AbstractMarketApi {
 
     }
 
-    private BitOrder getOrder(JSONObject jsonObject) {
-        BitOrder bitOrder = new BitOrder();
-        bitOrder.setOrderId(jsonObject.getLong("id"));
-        bitOrder.setOrderAmount(jsonObject.getDouble("volume"));
-        bitOrder.setOrderCnyPrice(jsonObject.getDouble("price"));
-        bitOrder.setOrderPrice(FiatConverter.toUsd(bitOrder.getOrderCnyPrice()));
-        bitOrder.setProcessedAmount(jsonObject.getDouble("executed_volume"));
-        bitOrder.setProcessedCnyPrice(jsonObject.getDouble("avg_price"));
-        bitOrder.setProcessedPrice(FiatConverter.toUsd(jsonObject.getDouble("avg_price")));
-        bitOrder.setFee(getTransactionFee());
+    private CoinOrder getOrder(JSONObject jsonObject) {
+        CoinOrder coinOrder = new CoinOrder();
+        coinOrder.setOrderId(jsonObject.getLong("id"));
+        coinOrder.setOrderAmount(jsonObject.getDouble("volume"));
+        coinOrder.setOrderCnyPrice(jsonObject.getDouble("price"));
+        coinOrder.setOrderPrice(FiatConverter.toUsd(coinOrder.getOrderCnyPrice()));
+        coinOrder.setProcessedAmount(jsonObject.getDouble("executed_volume"));
+        coinOrder.setProcessedCnyPrice(jsonObject.getDouble("avg_price"));
+        coinOrder.setProcessedPrice(FiatConverter.toUsd(jsonObject.getDouble("avg_price")));
+        coinOrder.setFee(getTransactionFee());
+        
+        
+        try {
+            SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            coinOrder.setCreateTime(sf.parse(jsonObject.getString("created_at").replaceAll("T", " ").replaceAll("Z", "")));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        
+        String side = jsonObject.getString("side");
+        
+        if ("sell".equals(side)) {
+            coinOrder.setOrderSide(OrderSide.sell);
+        } else if ("buy".equals(side)) {
+            coinOrder.setOrderSide(OrderSide.buy);
+        } else {
+            coinOrder.setOrderSide(OrderSide.empty);
+        }
+        
         String orderStatusStr = jsonObject.getString("state");
         OrderStatus orderStatus = OrderStatus.none;
         if ("wait".equals(orderStatusStr)) {
@@ -228,9 +248,9 @@ public class PeatioCNYApi extends AbstractMarketApi {
         } else if ("cancel".equals(orderStatusStr)) {
             orderStatus = OrderStatus.cancelled;
         }
-        bitOrder.setStatus(orderStatus);
+        coinOrder.setStatus(orderStatus);
 
-        return bitOrder;
+        return coinOrder;
     }
 
     private String getSign(AppAccount appAccount, TreeMap<String, String> parameters) {
@@ -343,7 +363,7 @@ public class PeatioCNYApi extends AbstractMarketApi {
         JSONObject data = this.get_json(symbolPair);
         if (data.containsKey("asks")) {
             JSONObject jsonObject = this.format_depth(data);
-            convert_to_usd(jsonObject);
+//            convert_to_usd(jsonObject);
             return jsonObject;
         }
         throw new RuntimeException("update_depth error");

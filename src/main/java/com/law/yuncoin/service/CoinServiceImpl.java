@@ -1,21 +1,23 @@
 package com.law.yuncoin.service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.bitcoin.market.AbstractMarketApi;
 import org.bitcoin.market.MarketApiFactory;
 import org.bitcoin.market.bean.Asset;
+import org.bitcoin.market.bean.CoinOrder;
 import org.bitcoin.market.bean.Market;
 import org.bitcoin.market.bean.Symbol;
+import org.bitcoin.market.bean.SymbolPair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.law.yuncoin.bean.StatusInfo;
 import com.law.yuncoin.bean.base.TickerInfo;
 import com.law.yuncoin.bean.base.TickerInfoExample;
@@ -25,8 +27,6 @@ import com.law.yuncoin.mapper.base.TickerInfoMapper;
 @Service
 public class CoinServiceImpl implements CoinService {
 
-    public static Map<String, String> flags = (Map<String, String>) new HashMap<String, String>();
-    
     @Autowired
     private TickerInfoMapper tickerInfoMapper;
 
@@ -41,29 +41,82 @@ public class CoinServiceImpl implements CoinService {
 
         // 获取账户余额
         Asset asset = getInfo();
+        // 获取计算结果信息,币种、分钟、接受浮动比例范围
+        StatusInfo statusInfo = getBuyCny(symbol, 10, 0.035);
+        
+        double amount = 1d;
+        double buyPrice = Double.valueOf(statusInfo.getPrice().toString());
+        
+        double total = buyPrice * amount;
+        
+        if (asset.getAvailableCny() < total) {
+            logger.error("cny余额不足....");
+            return 0;
+        }
+        
+        // +价挂单
+        CoinOrder coinBuyOrder = buy(buyPrice, amount);
 
-        // 获取中间值
-        // 保存已挂单信息（买入价、挂单价）
-        // 查询挂单信息
-        // 计算收益
-
-        return 0;
+        // 挂单失败
+        if (coinBuyOrder == null) {
+            logger.info("下单失败....购买价：" + buyPrice + ", 个数：" + amount);
+            return 0;
+        } else {
+            logger.info("下单成功....购买价：" + buyPrice + ", 个数：" + amount);
+        }
+        
+        // 卖价加0.4个点（成本0.2个点）
+        double sellPrice = buyPrice + (buyPrice * 0.004);
+        double sellAmount = amount - (amount * 0.001);
+        
+        CoinOrder coinSellOrder = sell(buyPrice, amount);
+        
+        if (coinSellOrder == null) {
+            logger.info("下单失败....卖价：" + sellPrice + ", 个数：" + sellAmount);
+            return 0;
+        } else {
+            logger.info("下单成功....卖价：" + sellPrice + ", 个数：" + sellAmount);
+        }
+        
+        return 1;
     }
 
     /**
-     * 取消买单,以免长时间挂着
+     * 挂卖单
      */
+    private CoinOrder sell(Double price, Double amount){
+        AbstractMarketApi market = MarketApiFactory.getInstance().getMarket(Market.PeatioCNY);
+        Long orderId = market.sell(AccountUtil.getAppAccount(), amount, price, new SymbolPair(Symbol.eos, Symbol.cny));
+        if (orderId == -1) {
+            return null;
+        }
+        CoinOrder order = market.getOrder(AccountUtil.getAppAccount(), orderId, null);
+        return order;
+    }
+    
+    /**
+     * 挂买单
+     */
+    private CoinOrder buy(Double price, Double amount) {
+        AbstractMarketApi market = MarketApiFactory.getInstance().getMarket(Market.PeatioCNY);
+        Long orderId = market.buy(AccountUtil.getAppAccount(), amount, price, new SymbolPair(Symbol.eos, Symbol.cny));
+        if (orderId == -1) {
+            return null;
+        }
+        CoinOrder order = market.getOrder(AccountUtil.getAppAccount(), orderId, null);
+        return order;
+    }
     
     /**
      * 获取购买值
      */
-    private BigDecimal getBuyCny(Symbol symbol, int minute, StatusInfo statusInfo) {
+    private StatusInfo getBuyCny(Symbol symbol, int minute, double paramLevel) {
 
         Date now = new Date();
 
         TickerInfoExample example = new TickerInfoExample();
         // 过去5分钟
-        example.createCriteria().andAtBetween(now, new Date(now.getTime() - minute * 60 * 1000));
+        example.createCriteria().andAtBetween(new Date(now.getTime() - minute * 60 * 1000), now);
         example.setOrderByClause("at asc");
 
         List<TickerInfo> tickerInfos = tickerInfoMapper.selectByExample(example);
@@ -77,30 +130,29 @@ public class CoinServiceImpl implements CoinService {
         // 最小值
         BigDecimal min = null;
         
+        // TODO ETH趋势
+        
         for (TickerInfo tickerInfo : tickerInfos) {
             
             BigDecimal tmp = tickerInfo.getLast();
             
-            if (tmp.compareTo(min) == -1) {
+            if (min == null || tmp.compareTo(min) == -1) {
                 min = tmp;
             }
-            if (tmp.compareTo(min) == 1) {
+            if (max == null || tmp.compareTo(max) == 1) {
                 max = tmp;
             }
             
-            logger.debug("----------------------------------------------------------------------------");
-            logger.debug(String.valueOf(tickerInfo.getLast()));
-            logger.debug("----------------------------------------------------------------------------");
+//            logger.debug("----------------------------------------------------------------------------");
+//            logger.debug(String.valueOf(tickerInfo.getLast()));
+//            logger.debug("----------------------------------------------------------------------------");
         }
         
         // 涨浮
-        BigDecimal level = first.divide(last).subtract(new BigDecimal(1));
+        BigDecimal level = first.divide(last, 3, RoundingMode.HALF_UP).subtract(new BigDecimal(1));
         
-        logger.debug(minute + "分钟内最小值 " + min);
-        logger.debug(minute + "分钟内最大值 " + max);
         // 中间值
-        BigDecimal result = min.add(max).divide(new BigDecimal(2));
-        logger.debug(minute + "分钟内中间值 " + result);
+        BigDecimal result = min.add(max).divide(new BigDecimal(2), 3, RoundingMode.HALF_UP);
         
         // 趋势
         boolean isUp = true;
@@ -112,43 +164,46 @@ public class CoinServiceImpl implements CoinService {
             level = level.subtract(level).subtract(level);
         }
         
-        // TODO 获取最新的委托信息
+        // 获取最新的委托信息
+        JSONObject depth = getDepth(symbol);
+        
         // 买一价
-        BigDecimal buy1 = null;
+        BigDecimal buy1 = depth.getJSONArray("bids").getJSONObject(0).getBigDecimal("price");
         // 卖一价
-        BigDecimal sell1 = null;
+        BigDecimal sell1 = depth.getJSONArray("asks").getJSONObject(0).getBigDecimal("price");
         
         if (isUp) {
             
-            if (level.compareTo(new BigDecimal(0.035)) == -1) {
+            if (level.compareTo(new BigDecimal(paramLevel)) == -1) {
                 result = result.compareTo(sell1) == 0 || result.compareTo(sell1) == 1 ? sell1 : result;
             } else {
-                // 几分钟内上涨10%,观望
+                // 几分钟内上涨超过3.5%,观望
                 new BigDecimal("0");
             }
             
         } else {
             
-            if (result.compareTo(level) == 0 || result.compareTo(level) == -1) {
+            if (new BigDecimal(paramLevel).compareTo(level) == 0 || new BigDecimal(paramLevel).compareTo(level) == -1) {
                 result = sell1;
             } else {
-                // 几分钟内上涨10%,观望
+                
+                // 几分钟内下跌超过3.5%,观望
                 new BigDecimal("0");
             }
         }
         
-        logger.debug(minute + "分钟内 " + (isUp?"上涨了":"下跌了") + level + "%");
-        logger.debug("当前买一价 " + buy1);
-        logger.debug("当前卖一价 " + sell1);
-        logger.debug(minute + "分钟内计算购买值 " + String.format("%.2f", result));
+        logger.info(minute + "分钟内最小值 " + min + "  最大值 " + max + "  中间值 " + result);
+        logger.info(minute + "分钟内 " + (isUp?"上涨了":"下跌了") + level + "%" + "  当前买一价 " + buy1 + "  当前卖一价  " + sell1 + minute + "分钟内计算购买值 " + String.format("%.2f", result));
         
+        StatusInfo statusInfo = new StatusInfo();
         // 保存数据
         statusInfo.setBuy1(buy1);
         statusInfo.setSell1(sell1);
         statusInfo.setUpFlag(isUp);
         statusInfo.setLevel(level);
+        statusInfo.setPrice(new BigDecimal(String.format("%.2f", result)));
         
-        return new BigDecimal(String.format("%.2f", result));
+        return statusInfo;
     }
 
     /**
@@ -157,8 +212,23 @@ public class CoinServiceImpl implements CoinService {
     private Asset getInfo() {
         AbstractMarketApi market = MarketApiFactory.getInstance().getMarket(Market.PeatioCNY);
         Asset asset = market.getInfo(AccountUtil.getAppAccount());
-        // System.out.println(asset.getAvailableCny());
-        // System.out.println(asset.getAvailableEos());
         return asset;
+    }
+    
+    /**
+     * 获取市场深度
+     */
+    private JSONObject getDepth(Symbol symbol){
+        AbstractMarketApi market = MarketApiFactory.getInstance().getMarket(Market.PeatioCNY);
+        JSONObject depth = market.get_depth(new SymbolPair(symbol, Symbol.cny), true);
+        return depth;
+    }
+    
+    /**
+     * 获取已挂单
+     */
+    private List<CoinOrder> getRunningOrder(Symbol symbol) {
+        AbstractMarketApi market = MarketApiFactory.getInstance().getMarket(Market.PeatioCNY);
+        return market.getRunningOrders(AccountUtil.getAppAccount(), symbol);
     }
 }

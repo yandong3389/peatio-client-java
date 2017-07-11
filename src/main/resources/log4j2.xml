@@ -2,7 +2,7 @@
 <Configuration status="off" monitorInterval="1800">
     <properties>
         <property name="LOG_HOME">logs</property>
-        <property name="FILE_NAME">mtwservice</property>
+        <property name="FILE_NAME">yuncoin</property>
     </properties>
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
@@ -19,10 +19,18 @@
         </RollingRandomAccessFile>
     </Appenders>
     <Loggers>
-        <!--<Logger name="com.talkforex.quotation.tick" level="info" additivity="true">-->
-            <!--<AppenderRef ref="running-log" />-->
-            <!--&lt;!&ndash;<AppenderRef ref="Console" />&ndash;&gt;-->
-        <!--</Logger>-->
+<!--         <Logger name="java.sql" level="debug" additivity="false"> -->
+<!--             <AppenderRef ref="running-log" /> -->
+<!--             <AppenderRef ref="Console" /> -->
+<!--         </Logger> -->
+<!--         <Logger name="org.springframework" level="debug" additivity="false"> -->
+<!--             <AppenderRef ref="running-log" /> -->
+<!--             <AppenderRef ref="Console" /> -->
+<!--         </Logger> -->
+<!--         <Logger name="com.law.yuncoin.mapper" level="debug" additivity="false"> -->
+<!--             <AppenderRef ref="running-log" /> -->
+<!--             <AppenderRef ref="Console" /> -->
+<!--         </Logger> -->
         <Root level="debug">
             <AppenderRef ref="Console" />
             <AppenderRef ref="running-log" />

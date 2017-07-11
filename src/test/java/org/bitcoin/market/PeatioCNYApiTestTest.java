@@ -1,16 +1,19 @@
 package org.bitcoin.market;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.List;
 
 import org.bitcoin.market.bean.AppAccount;
+import org.bitcoin.market.bean.CoinOrder;
 import org.bitcoin.market.bean.Kline;
 import org.bitcoin.market.bean.Market;
+import org.bitcoin.market.bean.OrderStatus;
 import org.bitcoin.market.bean.Symbol;
 import org.bitcoin.market.bean.SymbolPair;
 import org.junit.Test;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.law.yuncoin.common.AccountUtil;
 
 public class PeatioCNYApiTestTest {
@@ -23,10 +26,10 @@ public class PeatioCNYApiTestTest {
 //    public void testBuyAndCancel() throws Exception {
 //
 //        Double amount = 0.01;
-//        Double price = 10.0; // usd
+//        Double price = 10d;
 //        AbstractMarketApi market = MarketApiFactory.getInstance().getMarket(Market.PeatioCNY);
-//        Long orderId = market.buy(getAppAccount(), amount, price, new SymbolPair(Symbol.btc, Symbol.usd));
-//        BitOrder order = market.getOrder(getAppAccount(), orderId, null);
+//        Long orderId = market.buy(getAppAccount(), amount, price, new SymbolPair(Symbol.eos, Symbol.cny));
+//        CoinOrder order = market.getOrder(getAppAccount(), orderId, null);
 //        assertNotNull(order);
 //        assertEquals(OrderStatus.none, order.getStatus());
 //        assertEquals(amount, order.getOrderAmount());
@@ -36,15 +39,16 @@ public class PeatioCNYApiTestTest {
 //        assertNotNull(order);
 //        assertEquals(OrderStatus.cancelled, order.getStatus());
 //    }
-//
-//    @Test
-//    public void testSellAndCancel() throws Exception {
-//
-//        Double amount = 0.01;
-//        Double price = 100000.0; // usd
-//        AbstractMarketApi market = MarketApiFactory.getInstance().getMarket(Market.PeatioCNY);
-//        Long orderId = market.sell(getAppAccount(), amount, price, new SymbolPair(Symbol.btc, Symbol.usd));
-//        BitOrder order = market.getOrder(getAppAccount(), orderId, null);
+
+    @Test
+    public void testSellAndCancel() throws Exception {
+
+        Double amount = 29.97;
+        Double price = 11.25; // usd
+        AbstractMarketApi market = MarketApiFactory.getInstance().getMarket(Market.PeatioCNY);
+        Long orderId = market.sell(getAppAccount(), amount, price, new SymbolPair(Symbol.eos, Symbol.cny));
+        System.out.println(orderId);
+//        CoinOrder order = market.getOrder(getAppAccount(), orderId, null);
 //        assertNotNull(order);
 //        assertEquals(OrderStatus.none, order.getStatus());
 //        assertEquals(amount, order.getOrderAmount());
@@ -53,7 +57,7 @@ public class PeatioCNYApiTestTest {
 //        order = market.getOrder(getAppAccount(), orderId, null);
 //        assertNotNull(order);
 //        assertEquals(OrderStatus.cancelled, order.getStatus());
-//    }
+    }
 
 //    @Test
 //    public void testGetInfo() throws Exception {
@@ -77,7 +81,17 @@ public class PeatioCNYApiTestTest {
 //    public void testGetRunningOrder() throws Exception {
 //
 //        AbstractMarketApi market = MarketApiFactory.getInstance().getMarket(Market.PeatioCNY);
-//        List<BitOrder> bitOrders = market.getRunningOrders(getAppAccount());
+//        List<CoinOrder> bitOrders = market.getRunningOrders(getAppAccount(), Symbol.eos);
+//        
+//        
+//        for (CoinOrder coinOrder : bitOrders) {
+//            
+//            System.out.print(coinOrder.getOrderId() + "  " + coinOrder.getOrderSide() + "  " + coinOrder.getOrderCnyPrice() + "  " + coinOrder.getOrderAmount());
+//            System.out.print("  " + coinOrder.getCreateTime());
+//            System.out.println();
+//        }
+//        
+//        
 //        assertTrue(bitOrders.size() > 0);
 //    }
 
@@ -155,25 +169,25 @@ public class PeatioCNYApiTestTest {
 //
 //    }
 
-    @Test
-    public void testDepth() throws Exception {
-
-        AbstractMarketApi market = MarketApiFactory.getInstance().getMarket(Market.PeatioCNY);
-        JSONObject depth = market.get_depth(new SymbolPair(Symbol.eos, Symbol.cny), true);
-        
-        JSONArray jsonarrasks = depth.getJSONArray("asks");
-        JSONArray jsonarrbids = depth.getJSONArray("bids");
-        
-        for (int i = 0; i < jsonarrasks.size(); i++) {
-            
-            JSONObject obj = jsonarrasks.getJSONObject(i);
-            JSONObject obj2 = jsonarrbids.getJSONObject(i);
-            System.out.print(obj.getString("amount") + " " + obj.getString("price"));
-            System.out.print("\t");
-            System.out.print(obj2.getString("amount") + " " + obj2.getString("price"));
-            System.out.println();
-            
-        }
+//    @Test
+//    public void testDepth() throws Exception {
+//
+//        AbstractMarketApi market = MarketApiFactory.getInstance().getMarket(Market.PeatioCNY);
+//        JSONObject depth = market.get_depth(new SymbolPair(Symbol.eos, Symbol.cny), true);
+//        
+//        JSONArray jsonarrasks = depth.getJSONArray("asks");
+//        JSONArray jsonarrbids = depth.getJSONArray("bids");
+//        
+//        for (int i = 0; i < jsonarrasks.size(); i++) {
+//            
+//            JSONObject obj = jsonarrasks.getJSONObject(i);
+//            JSONObject obj2 = jsonarrbids.getJSONObject(i);
+//            System.out.print(obj.getString("amount") + " " + obj.getString("price"));
+//            System.out.print("\t");
+//            System.out.print(obj2.getString("amount") + " " + obj2.getString("price"));
+//            System.out.println();
+//            
+//        }
         
 //        System.out.println(depth.getJSONArray("asks").toJSONString());
 //        System.out.println(depth.getJSONArray("bids").toJSONString());
@@ -181,7 +195,7 @@ public class PeatioCNYApiTestTest {
 //        assertTrue(depth.containsKey("asks"));
 //        assertTrue(depth.containsKey("bids"));
 
-    }
+//    }
 
     private void printData(List<Kline> klines){
       
