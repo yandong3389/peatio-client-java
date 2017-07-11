@@ -69,7 +69,13 @@ public class CoinServiceImpl implements CoinService {
         double sellPrice = buyPrice + (buyPrice * 0.004);
         double sellAmount = amount - (amount * 0.001);
         
+        BigDecimal bg = new BigDecimal(sellAmount);  
+        sellAmount = bg.setScale(2, BigDecimal.ROUND_DOWN).doubleValue();
+        
+        System.err.println(sellAmount);
+        
         CoinOrder coinSellOrder = sell(buyPrice, amount);
+        
         
         if (coinSellOrder == null) {
             logger.info("下单失败....卖价：" + sellPrice + ", 个数：" + sellAmount);
