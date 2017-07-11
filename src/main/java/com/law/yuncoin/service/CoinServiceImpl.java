@@ -44,7 +44,11 @@ public class CoinServiceImpl implements CoinService {
         // 获取计算结果信息,币种、分钟、接受浮动比例范围
         StatusInfo statusInfo = getBuyCny(symbol, 10, 0.035);
         
-        double amount = 1d;
+        if (statusInfo == null) {
+            return 0;
+        }
+        
+        double amount = 3d;
         double buyPrice = Double.valueOf(statusInfo.getPrice().toString());
         
         double total = buyPrice * amount;
@@ -178,28 +182,32 @@ public class CoinServiceImpl implements CoinService {
         // 卖一价
         BigDecimal sell1 = depth.getJSONArray("asks").getJSONObject(0).getBigDecimal("price");
         
+        logger.info(minute + "分钟内最小值 " + min + "  最大值 " + max + "  中间值 " + result);
+        logger.info(minute + "分钟内 " + (isUp?"上涨了":"下跌了") + level + "%" + "  当前买一价 " + buy1 + "  当前卖一价   " + sell1);
+        
         if (isUp) {
             
             if (level.compareTo(new BigDecimal(paramLevel)) == -1) {
                 result = result.compareTo(sell1) == 0 || result.compareTo(sell1) == 1 ? sell1 : result;
             } else {
                 // 几分钟内上涨超过3.5%,观望
-                new BigDecimal("0");
+                logger.info("几分钟内上涨超过" + paramLevel + ",观望...");
+                return null;
             }
             
         } else {
             
-            if (new BigDecimal(paramLevel).compareTo(level) == 0 || new BigDecimal(paramLevel).compareTo(level) == -1) {
+            if (new BigDecimal(paramLevel).compareTo(level) == 0 || new BigDecimal(paramLevel).compareTo(level) == 1) {
                 result = sell1;
             } else {
                 
                 // 几分钟内下跌超过3.5%,观望
-                new BigDecimal("0");
+                logger.info("几分钟内下跌超过" + paramLevel + ",观望...");
+                return null;
             }
         }
         
-        logger.info(minute + "分钟内最小值 " + min + "  最大值 " + max + "  中间值 " + result);
-        logger.info(minute + "分钟内 " + (isUp?"上涨了":"下跌了") + level + "%" + "  当前买一价 " + buy1 + "  当前卖一价  " + sell1 + minute + "分钟内计算购买值 " + String.format("%.2f", result));
+        logger.info(minute + "分钟内计算购买值 " + String.format("%.2f", result));
         
         StatusInfo statusInfo = new StatusInfo();
         // 保存数据

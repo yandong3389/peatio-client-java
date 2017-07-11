@@ -76,7 +76,7 @@ public class ScheduledTasks {
     /**
      * 自动挂单
      */
-    @Scheduled(cron = "*/2 * *  * * * ")
+    @Scheduled(cron = "*/6 * *  * * * ")
     public void autoBuyAndSell() {
 
         if (start == 1) {
@@ -84,6 +84,10 @@ public class ScheduledTasks {
         }
     }
 
+    // 长时间未处理买单，需判断取消
+    // 长时间未处理卖单？？
+    // 卖单有偶尔挂单失败的，需要补挂措施
+    
 //    /**
 //     * 自动挂单
 //     */
