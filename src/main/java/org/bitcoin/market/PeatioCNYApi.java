@@ -43,7 +43,7 @@ public class PeatioCNYApi extends AbstractMarketApi {
     @Override
     public Long buy(AppAccount appAccount, double amount, double price, SymbolPair symbolPair, OrderType orderType) {
 
-        price = FiatConverter.toCNY(price);
+//        price = FiatConverter.toCNY(price);
         TreeMap<String, String> params = new TreeMap<String, String>();
         params.put("side", "buy");
         JSONObject response = trade(appAccount, amount, price, params, symbolPair, orderType);
@@ -55,7 +55,7 @@ public class PeatioCNYApi extends AbstractMarketApi {
 
     @Override
     public Long sell(AppAccount appAccount, double amount, double price, SymbolPair symbolPair, OrderType orderType) {
-        price = FiatConverter.toCNY(price);
+//        price = FiatConverter.toCNY(price);
         TreeMap<String, String> params = new TreeMap<String, String>();
         params.put("side", "sell");
         JSONObject response = trade(appAccount, amount, price, params, symbolPair, orderType);
