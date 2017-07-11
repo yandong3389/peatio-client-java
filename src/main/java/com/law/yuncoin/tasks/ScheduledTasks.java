@@ -76,7 +76,7 @@ public class ScheduledTasks {
     /**
      * 自动挂单
      */
-    @Scheduled(cron = "*/6 * *  * * * ")
+    @Scheduled(cron = "*/10 * *  * * * ")
     public void autoBuyAndSell() {
 
         if (start == 1) {

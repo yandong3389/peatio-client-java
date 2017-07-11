@@ -48,7 +48,7 @@ public class CoinServiceImpl implements CoinService {
             return 0;
         }
         
-        double amount = 3d;
+        double amount = 2d;
         double buyPrice = Double.valueOf(statusInfo.getPrice().toString());
         
         double total = buyPrice * amount;
@@ -77,7 +77,12 @@ public class CoinServiceImpl implements CoinService {
 //        sellAmount = bg.setScale(2, BigDecimal.ROUND_DOWN).doubleValue();
         
         System.err.println(sellAmount);
-        
+        try {
+            Thread.sleep(500l);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         CoinOrder coinSellOrder = sell(sellPrice, sellAmount);
         
         
