@@ -43,8 +43,8 @@ public class PeatioCNYApiTestTest {
     @Test
     public void testSellAndCancel() throws Exception {
 
-        Double amount = 29.97;
-        Double price = 11.25; // usd
+        Double amount = 0.999;
+        Double price = 11.50; // usd
         AbstractMarketApi market = MarketApiFactory.getInstance().getMarket(Market.PeatioCNY);
         Long orderId = market.sell(getAppAccount(), amount, price, new SymbolPair(Symbol.eos, Symbol.cny));
         System.out.println(orderId);

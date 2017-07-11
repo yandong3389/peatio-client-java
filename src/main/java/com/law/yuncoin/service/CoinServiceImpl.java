@@ -69,12 +69,12 @@ public class CoinServiceImpl implements CoinService {
         double sellPrice = buyPrice + (buyPrice * 0.004);
         double sellAmount = amount - (amount * 0.001);
         
-        BigDecimal bg = new BigDecimal(sellAmount);  
-        sellAmount = bg.setScale(2, BigDecimal.ROUND_DOWN).doubleValue();
+//        BigDecimal bg = new BigDecimal(sellAmount);  
+//        sellAmount = bg.setScale(2, BigDecimal.ROUND_DOWN).doubleValue();
         
         System.err.println(sellAmount);
         
-        CoinOrder coinSellOrder = sell(buyPrice, amount);
+        CoinOrder coinSellOrder = sell(buyPrice, sellAmount);
         
         
         if (coinSellOrder == null) {
