@@ -196,29 +196,71 @@ public class CoinServiceImpl implements CoinService {
         // 卖一价
         BigDecimal sell1 = depth.getJSONArray("asks").getJSONObject(0).getBigDecimal("price");
         
+        
+        // 几层市场
+        int depthLevel = depth.getJSONArray("asks").size();
+        
+        // 买单量
+        BigDecimal buyTotal = new BigDecimal(0);
+        // 卖单量
+        BigDecimal sellTotal = new BigDecimal(0);
+        
+        int index = 0;
+        
+        for (int i = 0; i < depthLevel; i++) {
+            
+            index++;
+            
+            buyTotal = sellTotal.add(depth.getJSONArray("bids").getJSONObject(0).getBigDecimal("amount"));
+            sellTotal = sellTotal.add(depth.getJSONArray("asks").getJSONObject(0).getBigDecimal("amount"));
+            
+            // 买单或卖单超10000  跳出循环
+            if (buyTotal.compareTo(new BigDecimal(10000)) == 1
+                    || sellTotal.compareTo(new BigDecimal(10000)) == 1) {
+                break;
+            }
+        }
+        
+        // 总量
+        BigDecimal amountTotal = sellTotal.add(buyTotal);
+        
+        // 买单占比
+        BigDecimal buys = buyTotal.divide(amountTotal,2,BigDecimal.ROUND_HALF_UP);
+        System.err.println(index + "层市场深度...");
+        System.err.println("buyTotal is " + buyTotal + "  占比：" + buyTotal.divide(amountTotal,4,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) + "%");
+        System.err.println("sellTotal is " + sellTotal + "  占比：" + sellTotal.divide(amountTotal,4,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) + "%");
+        
         logger.info(minute + "分钟内最小值 " + min + "  最大值 " + max + "  中间值 " + result);
         logger.info(minute + "分钟内 " + (isUp?"上涨了":"下跌了") + level + "%" + "  当前买一价 " + buy1 + "  当前卖一价   " + sell1);
         
-        if (isUp) {
+        // 买单量大于50%
+        if (buys.compareTo(new BigDecimal(0.5)) == 1) {
             
-            if (level.compareTo(new BigDecimal(paramLevel)) == -1) {
-                result = result.compareTo(sell1) == 0 || result.compareTo(sell1) == 1 ? sell1 : result;
-            } else {
-                // 几分钟内上涨超过3.5%,观望
-                logger.info("几分钟内上涨超过" + paramLevel + ",观望...");
-                return null;
-            }
-            
-        } else {
-            
-            if (new BigDecimal(paramLevel).compareTo(level) == 0 || new BigDecimal(paramLevel).compareTo(level) == 1) {
-                result = sell1;
+            if (isUp) {
+                
+                if (level.compareTo(new BigDecimal(paramLevel)) == -1) {
+                    result = result.compareTo(sell1) == 0 || result.compareTo(sell1) == 1 ? sell1 : result;
+                } else {
+                    // 几分钟内上涨超过3.5%,观望
+                    logger.info("几分钟内上涨超过" + paramLevel + ",观望...");
+                    return null;
+                }
+                
             } else {
                 
-                // 几分钟内下跌超过3.5%,观望
-                logger.info("几分钟内下跌超过" + paramLevel + ",观望...");
-                return null;
+                if (new BigDecimal(paramLevel).compareTo(level) == 0 || new BigDecimal(paramLevel).compareTo(level) == 1) {
+                    result = sell1;
+                } else {
+                    
+                    // 几分钟内下跌超过3.5%,观望
+                    logger.info("几分钟内下跌超过" + paramLevel + ",观望...");
+                    return null;
+                }
             }
+        } else {
+            // 几分钟内下跌超过3.5%,观望
+            logger.info("卖单量超过50%,观望...");
+            return null;
         }
         
         logger.info(minute + "分钟内计算购买值 " + String.format("%.2f", result));
