@@ -1,11 +1,12 @@
 package org.bitcoin.market;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.bitcoin.market.bean.AppAccount;
+import org.bitcoin.market.bean.Asset;
 import org.bitcoin.market.bean.CoinOrder;
 import org.bitcoin.market.bean.Kline;
 import org.bitcoin.market.bean.Market;
@@ -40,14 +41,14 @@ public class PeatioCNYApiTestTest {
 //        assertEquals(OrderStatus.cancelled, order.getStatus());
 //    }
 
-    @Test
-    public void testSellAndCancel() throws Exception {
-
-        Double amount = 0.999;
-        Double price = 11.50; // usd
-        AbstractMarketApi market = MarketApiFactory.getInstance().getMarket(Market.PeatioCNY);
-        Long orderId = market.sell(getAppAccount(), amount, price, new SymbolPair(Symbol.eos, Symbol.cny));
-        System.out.println(orderId);
+//    @Test
+//    public void testSellAndCancel() throws Exception {
+//
+//        Double amount = 21d;
+//        Double price = 11.2; // usd
+//        AbstractMarketApi market = MarketApiFactory.getInstance().getMarket(Market.PeatioCNY);
+//        Long orderId = market.sell(getAppAccount(), amount, price, new SymbolPair(Symbol.eos, Symbol.cny));
+//        System.out.println(orderId);
 //        CoinOrder order = market.getOrder(getAppAccount(), orderId, null);
 //        assertNotNull(order);
 //        assertEquals(OrderStatus.none, order.getStatus());
@@ -57,16 +58,23 @@ public class PeatioCNYApiTestTest {
 //        order = market.getOrder(getAppAccount(), orderId, null);
 //        assertNotNull(order);
 //        assertEquals(OrderStatus.cancelled, order.getStatus());
-    }
-
-//    @Test
-//    public void testGetInfo() throws Exception {
-//        AbstractMarketApi market = MarketApiFactory.getInstance().getMarket(Market.PeatioCNY);
-//        Asset asset = market.getInfo(getAppAccount());
-//        System.out.println(asset.getAvailableCny());
-//        System.out.println(asset.getAvailableEos());
-//        assertNotNull(asset);
 //    }
+
+    @Test
+    public void testGetInfo() throws Exception {
+//        
+//        System.out.println(new BigDecimal(1).compareTo(new BigDecimal(2)));
+//        System.out.println(new BigDecimal(1).compareTo(new BigDecimal(1)));
+//        System.out.println(new BigDecimal(2).compareTo(new BigDecimal(1)));
+        
+        
+        
+        AbstractMarketApi market = MarketApiFactory.getInstance().getMarket(Market.PeatioCNY);
+        Asset asset = market.getInfo(getAppAccount());
+        System.err.println(asset.getAvailableCny());
+        System.err.println(asset.getAvailableEos());
+        assertNotNull(asset);
+    }
 
 //    @Test
 //    public void testGetOrder() throws Exception {

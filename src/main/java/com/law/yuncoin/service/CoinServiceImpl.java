@@ -42,7 +42,7 @@ public class CoinServiceImpl implements CoinService {
         // 获取账户余额
         Asset asset = getInfo();
         // 获取计算结果信息,币种、分钟、接受浮动比例范围
-        StatusInfo statusInfo = getBuyCny(symbol, 10, 0.035);
+        StatusInfo statusInfo = getBuyCny(symbol, 3, 0.015);
         
         if (statusInfo == null) {
             return 0;
@@ -85,9 +85,18 @@ public class CoinServiceImpl implements CoinService {
         }
         CoinOrder coinSellOrder = sell(sellPrice, sellAmount);
         
+        if (coinSellOrder == null) {
+            logger.info("下单失败重试1....卖价：" + sellPrice + ", 个数：" + sellAmount);
+            coinSellOrder = sell(sellPrice, sellAmount);
+        }
         
         if (coinSellOrder == null) {
-            logger.info("下单失败....卖价：" + sellPrice + ", 个数：" + sellAmount);
+            logger.info("下单失败重试2....卖价：" + sellPrice + ", 个数：" + sellAmount);
+            coinSellOrder = sell(sellPrice, sellAmount);
+        }
+        
+        if (coinSellOrder == null) {
+            logger.info("再次下单失败....卖价：" + sellPrice + ", 个数：" + sellAmount);
             return 0;
         } else {
             logger.info("下单成功....卖价：" + sellPrice + ", 个数：" + sellAmount);
@@ -164,7 +173,7 @@ public class CoinServiceImpl implements CoinService {
         }
         
         // 涨浮
-        BigDecimal level = first.divide(last, 3, RoundingMode.HALF_UP).subtract(new BigDecimal(1));
+        BigDecimal level = first.divide(last, 5, RoundingMode.HALF_UP).subtract(new BigDecimal(1));
         
         // 中间值
         BigDecimal result = min.add(max).divide(new BigDecimal(2), 3, RoundingMode.HALF_UP);
